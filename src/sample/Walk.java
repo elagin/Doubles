@@ -24,16 +24,16 @@ public class Walk {
     long totalSize = 0;
     long speedBpS = 0;
 
-    public void scan(String dir) throws IOException {
-        long startTimer = System.currentTimeMillis();
-        Files.walk(Paths.get(dir)).forEach(filePath -> {
-            if (Files.isRegularFile(filePath)) {
-                final String fileName = filePath.toString();
-                FileInfo fileInfo = getCheckSumFile(fileName);
-                if (fileInfo != null) {
-                    totalSize += fileInfo.size;
-                    long totalTime = System.currentTimeMillis() - startTimer;
-                    fileProcessed++;
+    public void scan(String fileName) throws IOException {
+//        long startTimer = System.currentTimeMillis();
+//        Files.walk(Paths.get(dir)).forEach(filePath -> {
+//            if (Files.isRegularFile(filePath)) {
+//                final String fileName = filePath.toString();
+        FileInfo fileInfo = getCheckSumFile(fileName);
+        if (fileInfo != null) {
+            totalSize += fileInfo.size;
+            //long totalTime = System.currentTimeMillis() - startTimer;
+            fileProcessed++;
 //                    if (totalTime > 1000) {
 //                        totalTime = totalTime / 1000;
 //                        speedBpS = totalSize / totalTime;
@@ -43,8 +43,8 @@ public class Walk {
 //                        System.out.println(" Общий объем " + readableFileSize(totalSize) + " Общее время \t" + totalTime + " мсек. Скорость: " + readableFileSize(speedBpS) + " / сек.");
 //                    }
 
-                    fileInfo.setName(fileName);
-                    fileList.add(fileInfo);
+            fileInfo.setName(fileName);
+            fileList.add(fileInfo);
 
 //                    String oldFile = fileMap.get(fileInfo.crc);
 //                    if (oldFile == null)
@@ -55,13 +55,13 @@ public class Walk {
 //                        getFileDetails(oldFile);
 //                        System.out.println("-----------------");
 //                    }
-                }
-            }
-        });
-        long totalTime = System.currentTimeMillis() - startTimer;
-        totalTime = totalTime / 1000;
-        speedBpS = totalSize / totalTime;
-        System.out.println("Обработано "+ fileProcessed + " файлов. Общий объем " + readableFileSize(totalSize) + " Общее время \t" + totalTime + " сек. Скорость: " + readableFileSize(speedBpS) + " / сек.");
+        }
+//            }
+//        });
+//        long totalTime = System.currentTimeMillis() - startTimer;
+//        totalTime = totalTime / 1000;
+//        speedBpS = totalSize / totalTime;
+//        System.out.println("Обработано "+ fileProcessed + " файлов. Общий объем " + readableFileSize(totalSize) + " Общее время \t" + totalTime + " сек. Скорость: " + readableFileSize(speedBpS) + " / сек.");
     }
 
     private String cutFileName(String filename) {
@@ -74,7 +74,7 @@ public class Walk {
 
     private String readableFileSize(long size) {
         if (size <= 0) return "0";
-        final String[] units = new String[]{"B", "kB", "MB", "GB", "TB"};
+        final String[] units = new String[]{"Б", "кБ", "МБ", "ГБ", "ТБ"};
         int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
         return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }

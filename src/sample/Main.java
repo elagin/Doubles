@@ -1,35 +1,37 @@
 package sample;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.prefs.Preferences;
 
 public class Main extends Application {
 
     Walk walk = new Walk();
-    Preferences preferences = Preferences.userNodeForPackage( Main.class );
+    Preferences preferences = Preferences.userNodeForPackage(Main.class);
 
     final String FIRST_FOLDER = "firstFolder";
     final String SECOND_FOLDER = "secondFolder";
+    Label curentFileLabel;
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
 //        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Hello World");
 
@@ -77,18 +79,18 @@ public class Main extends Application {
             public void handle(ActionEvent e) {
                 DirectoryChooser directoryChooser = new DirectoryChooser();
                 directoryChooser.setTitle("Выбор первой папки");
-                if(firstFolderField.getText() != null)
+                if (firstFolderField.getText() != null)
                     directoryChooser.setInitialDirectory(new File(firstFolderField.getText()));
                 try {
                     File file = directoryChooser.showDialog(null);
-                    if(file!=null){
+                    if (file != null) {
                         firstFolderField.setText(file.getPath());
                     }
                 } catch (IllegalArgumentException ex) {
                     ex.getLocalizedMessage();
                     directoryChooser.setInitialDirectory(null);
                     File file = directoryChooser.showDialog(null);
-                    if(file!=null){
+                    if (file != null) {
                         firstFolderField.setText(file.getPath());
                     }
                 }
@@ -103,18 +105,18 @@ public class Main extends Application {
             public void handle(ActionEvent e) {
                 DirectoryChooser directoryChooser = new DirectoryChooser();
                 directoryChooser.setTitle("Выбор второй папки");
-                if(secondFolder.getText() != null)
+                if (secondFolder.getText() != null)
                     directoryChooser.setInitialDirectory(new File(secondFolder.getText()));
                 try {
                     File file = directoryChooser.showDialog(null);
-                    if(file!=null){
+                    if (file != null) {
                         secondFolder.setText(file.getPath());
                     }
                 } catch (IllegalArgumentException ex) {
                     ex.getLocalizedMessage();
                     directoryChooser.setInitialDirectory(null);
                     File file = directoryChooser.showDialog(null);
-                    if(file!=null){
+                    if (file != null) {
                         secondFolder.setText(file.getPath());
                     }
                 }
@@ -132,19 +134,49 @@ public class Main extends Application {
             @Override
             public void handle(ActionEvent event) {
                 System.out.println("Hello World!");
-                try {
-                    String firstFolder = firstFolderField.getText();
-                    preferences.put( FIRST_FOLDER, firstFolder );
-                    preferences.put( SECOND_FOLDER, secondFolder.getText() );
-                    walk.scan(firstFolder);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+//                try {
+                String firstFolder = firstFolderField.getText();
+                preferences.put(FIRST_FOLDER, firstFolder);
+                preferences.put(SECOND_FOLDER, secondFolder.getText());
+
+                Task task = new Task<Void>() {
+                    @Override
+                    public Void call() throws Exception {
+                        int i = 0;
+                        Files.walk(Paths.get(dir)).forEach(filePath -> {
+                            if (Files.isRegularFile(filePath)) {
+                                final String fileName = filePath.toString();
+                                Platform.runLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        curentFileLabel.setText(fileName);
+                                    }
+                                });
+                            }
+                        });
+                        return null;
+                    }
+                };
+                Thread th = new Thread(task);
+                th.setDaemon(true);
+                th.start();
             }
         });
         root.getChildren().add(btn);
 
-        primaryStage.setScene(new Scene(root, 300, 275));
+        curentFileLabel = new Label();
+//        TextField textField = new TextField ();
+//        HBox hb = new HBox();
+//        hb.getChildren().addAll(label1, textField);
+//        hb.setSpacing(10);
+
+        GridPane.setConstraints(curentFileLabel, 0, 3);
+        GridPane.setColumnSpan(curentFileLabel, 2);
+        grid.getChildren().add(curentFileLabel);
+
+        curentFileLabel.setText("ssssss");
+
+        primaryStage.setScene(new Scene(root, 600, 475));
         primaryStage.show();
     }
 
