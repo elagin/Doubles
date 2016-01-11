@@ -1,12 +1,16 @@
 package sample;
 
+import com.sun.javafx.font.freetype.HBGlyphLayout;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -23,12 +27,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.prefs.Preferences;
+
+import static sample.Utils.readableFileSize;
 
 public class Main extends Application {
 
     Walk walk = new Walk();
     Preferences preferences = Preferences.userNodeForPackage(Main.class);
+
+    List<FileInfo> fileList = new ArrayList<>();
 
     final String FIRST_FOLDER = "firstFolder";
     final String SECOND_FOLDER = "secondFolder";
@@ -47,7 +57,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-//        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Hello World");
 
         String dir = "/home/pavel";
@@ -58,15 +68,19 @@ public class Main extends Application {
         //dir = "/home/pavel/.thumbnails/normal";
         //dir = "/home/pavel/Загрузки";
         //dir = "/home/pavel/Изображения/мото";
-        StackPane root = new StackPane();
+//        StackPane root = new StackPane();
 
 //Creating a GridPane container
-        GridPane grid = new GridPane();
-        grid.setPadding(new Insets(10, 10, 10, 10));
-        grid.setVgap(5);
-        grid.setHgap(5);
-        grid.setGridLinesVisible(true);
+//        GridPane grid = new GridPane();
+//        grid.setPadding(new Insets(10, 10, 10, 10));
+//        grid.setVgap(5);
+//        grid.setHgap(5);
+//        grid.setGridLinesVisible(true);
 
+//        VBox foldersBlock = new VBox(10);
+
+//        HBox firstBox = new HBox(10);
+//        foldersBlock.getChildren().add(firstBox);
 //Defining the Name text field
         final TextField firstFolderField = new TextField();
         firstFolderField.setPromptText("Enter your first folder.");
@@ -74,23 +88,11 @@ public class Main extends Application {
         firstFolderField.setText(preferences.get(FIRST_FOLDER, ""));
         firstFolderField.getText();
         GridPane.setConstraints(firstFolderField, 0, 0);
-        grid.getChildren().add(firstFolderField);
-//Defining the Last Name text field
-        final TextField secondFolder = new TextField();
-        secondFolder.setPromptText("Enter your second folder.");
-        GridPane.setConstraints(secondFolder, 0, 1);
-        secondFolder.setText(preferences.get(SECOND_FOLDER, ""));
-        grid.getChildren().add(secondFolder);
-//Defining the Comment text field
-        final TextField distFolder = new TextField();
-        distFolder.setPrefColumnCount(15);
-        distFolder.setPromptText("Enter your dist folder");
-        GridPane.setConstraints(distFolder, 0, 2);
-        grid.getChildren().add(distFolder);
+        //firstBox.getChildren().add(firstFolderField);
 
         Button browseFirstFolder = new Button("Обзор...");
         GridPane.setConstraints(browseFirstFolder, 1, 0);
-        grid.getChildren().add(browseFirstFolder);
+        //firstBox.getChildren().add(browseFirstFolder);
         browseFirstFolder.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
@@ -114,35 +116,48 @@ public class Main extends Application {
             }
         });
 
-//Defining the Clear button
-        Button browseSecondFolder = new Button("Обзор...");
-        GridPane.setConstraints(browseSecondFolder, 1, 1);
-        browseSecondFolder.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                DirectoryChooser directoryChooser = new DirectoryChooser();
-                directoryChooser.setTitle("Выбор второй папки");
-                if (secondFolder.getText() != null)
-                    directoryChooser.setInitialDirectory(new File(secondFolder.getText()));
-                try {
-                    File file = directoryChooser.showDialog(null);
-                    if (file != null) {
-                        secondFolder.setText(file.getPath());
-                    }
-                } catch (IllegalArgumentException ex) {
-                    ex.getLocalizedMessage();
-                    directoryChooser.setInitialDirectory(null);
-                    File file = directoryChooser.showDialog(null);
-                    if (file != null) {
-                        secondFolder.setText(file.getPath());
-                    }
-                }
-            }
-        });
+//        HBox secondBox = new HBox(10);
+//        foldersBlock.getChildren().add(secondBox);
+//        final TextField secondFolder = new TextField();
+//        secondFolder.setPromptText("Enter your second folder.");
+//        GridPane.setConstraints(secondFolder, 0, 1);
+//        secondFolder.setText(preferences.get(SECOND_FOLDER, ""));
+//        secondBox.getChildren().add(secondFolder);
 
-        grid.getChildren().add(browseSecondFolder);
+//        Button browseSecondFolder = new Button("Обзор...");
+//        GridPane.setConstraints(browseSecondFolder, 1, 1);
+//        browseSecondFolder.setOnAction(new EventHandler<ActionEvent>() {
+//            @Override
+//            public void handle(ActionEvent e) {
+//                DirectoryChooser directoryChooser = new DirectoryChooser();
+//                directoryChooser.setTitle("Выбор второй папки");
+//                if (secondFolder.getText() != null)
+//                    directoryChooser.setInitialDirectory(new File(secondFolder.getText()));
+//                try {
+//                    File file = directoryChooser.showDialog(null);
+//                    if (file != null) {
+//                        secondFolder.setText(file.getPath());
+//                    }
+//                } catch (IllegalArgumentException ex) {
+//                    ex.getLocalizedMessage();
+//                    directoryChooser.setInitialDirectory(null);
+//                    File file = directoryChooser.showDialog(null);
+//                    if (file != null) {
+//                        secondFolder.setText(file.getPath());
+//                    }
+//                }
+//            }
+//        });
+//        secondBox.getChildren().add(browseSecondFolder);
 
-        root.getChildren().add(grid);
+//        HBox destBox = new HBox(10);
+//        foldersBlock.getChildren().add(destBox);
+
+//        final TextField distFolder = new TextField();
+//        distFolder.setPrefColumnCount(15);
+//        distFolder.setPromptText("Enter your dist folder");
+//        GridPane.setConstraints(distFolder, 0, 2);
+//        destBox.getChildren().add(distFolder);
 
         Button startBtn = new Button();
         startBtn.setText("Старт");
@@ -150,20 +165,23 @@ public class Main extends Application {
             @Override
             public void handle(ActionEvent event) {
                 System.out.println("Старт");
-                String firstFolder = firstFolderField.getText();
-                preferences.put(FIRST_FOLDER, firstFolder);
-                preferences.put(SECOND_FOLDER, secondFolder.getText());
+                //String firstFolder = firstFolderField.getText();
+//                preferences.put(FIRST_FOLDER, firstFolder);
+//                preferences.put(SECOND_FOLDER, secondFolder.getText());
 
                 Task task = new Task<Void>() {
                     @Override
                     public Void call() throws Exception {
                         long startTimer = System.currentTimeMillis();
+                        //walkin(new File(firstFolder));
                         Files.walk(Paths.get(dir)).forEach(filePath -> {
                             if (Files.isRegularFile(filePath)) {
                                 final String fileName = filePath.toString();
                                 try {
                                     FileInfo fileInfo = walk.scan(fileName);
                                     if (fileInfo != null) {
+                                        fileList.add(fileInfo);
+
                                         totalSize += fileInfo.size;
                                         fileProcessed++;
                                         totalTime = System.currentTimeMillis() - startTimer;
@@ -196,6 +214,8 @@ public class Main extends Application {
             }
         });
 
+        //root.getChildren().add(foldersBlock);
+
         Button stopBtn = new Button();
         stopBtn.setText("Стоп");
 
@@ -218,15 +238,16 @@ public class Main extends Application {
         infoBar.setAlignment(Pos.BOTTOM_LEFT);
         publicBlock.getChildren().add(infoBar);
 
-
         totalFilesField = new Label("Обработано 0 файлов.");
-        infoBar.getChildren().add(totalFilesField);
+//        infoBar.getChildren().add(totalFilesField);
 
         totalBytesField = new Label("Обработано 0 байт.");
-        infoBar.getChildren().add(totalBytesField);
+//        infoBar.getChildren().add(totalBytesField);
 
-        root.getChildren().add(publicBlock);
+        //root.getChildren().add(publicBlock);
 
+        //root.getChildren().add(stopBtn);
+/*
         curentFileLabel = new Label();
         infoBar.getChildren().add(curentFileLabel);
 
@@ -240,7 +261,7 @@ public class Main extends Application {
 //        grid.getChildren().add(curentFileLabel);
 //
 //        curentFileLabel.setText("ssssss");
-
+*/
         primaryStage.setScene(new Scene(root, 600, 475));
         primaryStage.show();
     }
@@ -249,10 +270,16 @@ public class Main extends Application {
         launch(args);
     }
 
-    private String readableFileSize(long size) {
-        if (size <= 0) return "0";
-        final String[] units = new String[]{"Б", "кБ", "МБ", "ГБ", "ТБ"};
-        int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
-        return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+    public void walkin(File dir) {
+        File listFile[] = dir.listFiles();
+        if (listFile != null) {
+            for (int i=0; i<listFile.length; i++) {
+                if (listFile[i].isDirectory()) {
+                    walkin(listFile[i]);
+                } else {
+                        System.out.println(listFile[i].getPath());
+                }
+            }
+        }
     }
 }

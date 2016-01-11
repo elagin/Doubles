@@ -8,12 +8,9 @@ public class FileInfo {
     public long size;
     public String name;
 
-    public FileInfo(long crc, long size) {
+    public FileInfo(long crc, long size, String name) {
         this.crc = crc;
         this.size = size;
-    }
-
-    public void setName(String name) {
         this.name = name;
     }
 }
