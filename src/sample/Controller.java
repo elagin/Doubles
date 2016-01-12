@@ -70,10 +70,23 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         bindStartButtonEvents();
-        browseButtonsEvents();
+        bindBrowseButtonsEvents();
+        initFields();
     }
 
-    private void browseButtonsEvents() {
+    private void initFields() {
+        firstFolderField.setText(model.getFirstFolder());
+        secondFolderField.setText(model.getSecondFolder());
+        destFolderField.setText(model.getDestFolder());
+    }
+
+    private void saveFields() {
+        model.setFirstFolder(firstFolderField.getText());
+        model.setSecondFolder(secondFolderField.getText());
+        model.setDestFolder(destFolderField.getText());
+    }
+
+    private void bindBrowseButtonsEvents() {
         browseFirstFolder.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
@@ -153,10 +166,7 @@ public class Controller implements Initializable {
             @Override
             public void handle(ActionEvent event) {
                 System.out.println("Старт");
-                //String firstFolder = firstFolderField.getText();
-//                preferences.put(FIRST_FOLDER, firstFolder);
-//                preferences.put(SECOND_FOLDER, secondFolder.getText());
-
+                saveFields();
                 Task task = new Task<Void>() {
                     @Override
                     public Void call() throws Exception {

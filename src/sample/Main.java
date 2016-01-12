@@ -36,12 +36,9 @@ import static sample.Utils.readableFileSize;
 public class Main extends Application {
 
     Walk walk = new Walk();
-    Preferences preferences = Preferences.userNodeForPackage(Main.class);
+    //Preferences preferences = Preferences.userNodeForPackage(Main.class);
 
     List<FileInfo> fileList = new ArrayList<>();
-
-    final String FIRST_FOLDER = "firstFolder";
-    final String SECOND_FOLDER = "secondFolder";
 
     int fileProcessed = 0;
     long totalSize = 0;
@@ -85,7 +82,7 @@ public class Main extends Application {
         final TextField firstFolderField = new TextField();
         firstFolderField.setPromptText("Enter your first folder.");
         firstFolderField.setPrefColumnCount(10);
-        firstFolderField.setText(preferences.get(FIRST_FOLDER, ""));
+        //firstFolderField.setText(preferences.get(FIRST_FOLDER, ""));
         firstFolderField.getText();
         GridPane.setConstraints(firstFolderField, 0, 0);
         //firstBox.getChildren().add(firstFolderField);
@@ -262,7 +259,7 @@ public class Main extends Application {
 //
 //        curentFileLabel.setText("ssssss");
 */
-        primaryStage.setScene(new Scene(root, 600, 475));
+        primaryStage.setScene(new Scene(root, 800, 500));
         primaryStage.show();
     }
 
