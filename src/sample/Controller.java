@@ -44,6 +44,18 @@ public class Controller implements Initializable {
     @FXML
     private Button browseFirstFolder;
 
+    @FXML
+    private TextField secondFolderField;
+
+    @FXML
+    private Button browseSecondFolder;
+
+    @FXML
+    private TextField destFolderField;
+
+    @FXML
+    private Button browseDestFolder;
+
     // MODEL
     private final Model model = new Model();
 
@@ -80,6 +92,52 @@ public class Controller implements Initializable {
                     File file = directoryChooser.showDialog(null);
                     if (file != null) {
                         firstFolderField.setText(file.getPath());
+                    }
+                }
+            }
+        });
+
+        browseSecondFolder.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                DirectoryChooser directoryChooser = new DirectoryChooser();
+                directoryChooser.setTitle("Выбор первой папки");
+                if (secondFolderField.getText() != null)
+                    directoryChooser.setInitialDirectory(new File(secondFolderField.getText()));
+                try {
+                    File file = directoryChooser.showDialog(null);
+                    if (file != null) {
+                        secondFolderField.setText(file.getPath());
+                    }
+                } catch (IllegalArgumentException ex) {
+                    ex.getLocalizedMessage();
+                    directoryChooser.setInitialDirectory(null);
+                    File file = directoryChooser.showDialog(null);
+                    if (file != null) {
+                        secondFolderField.setText(file.getPath());
+                    }
+                }
+            }
+        });
+
+        browseDestFolder.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                DirectoryChooser directoryChooser = new DirectoryChooser();
+                directoryChooser.setTitle("Выбор первой папки");
+                if (destFolderField.getText() != null)
+                    directoryChooser.setInitialDirectory(new File(destFolderField.getText()));
+                try {
+                    File file = directoryChooser.showDialog(null);
+                    if (file != null) {
+                        destFolderField.setText(file.getPath());
+                    }
+                } catch (IllegalArgumentException ex) {
+                    ex.getLocalizedMessage();
+                    directoryChooser.setInitialDirectory(null);
+                    File file = directoryChooser.showDialog(null);
+                    if (file != null) {
+                        destFolderField.setText(file.getPath());
                     }
                 }
             }

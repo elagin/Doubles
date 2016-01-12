@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.paint.*?>
-
 <AnchorPane id="AnchorPane" fx:controller="sample.Controller" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="475.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2">
   <children>
     <VBox layoutX="0.0" layoutY="0.0" prefHeight="25.0" prefWidth="600.0">
@@ -19,14 +15,14 @@
         </HBox>
         <HBox alignment="TOP_CENTER" prefHeight="-1.0" prefWidth="-1.0">
           <children>
-            <TextField alignment="CENTER_LEFT" prefWidth="200.0" />
-            <Button alignment="CENTER_RIGHT" mnemonicParsing="false" text="Button" />
+            <TextField fx:id="secondFolderField" alignment="CENTER_LEFT" prefWidth="200.0" />
+            <Button fx:id="browseSecondFolder" alignment="CENTER_RIGHT" mnemonicParsing="false" text="Обзор..." />
           </children>
         </HBox>
         <HBox alignment="TOP_CENTER" prefHeight="-1.0" prefWidth="-1.0">
           <children>
-            <TextField alignment="CENTER_LEFT" prefWidth="200.0" />
-            <Button alignment="CENTER_RIGHT" mnemonicParsing="false" text="Button" />
+            <TextField fx:id="destFolderField" alignment="CENTER_LEFT" prefWidth="200.0" />
+            <Button fx:id="browseDestFolder" alignment="CENTER_RIGHT" mnemonicParsing="false" text="Обзор..." />
           </children>
         </HBox>
         <HBox alignment="TOP_CENTER" prefHeight="-1.0" prefWidth="-1.0">
