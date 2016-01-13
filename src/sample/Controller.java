@@ -12,7 +12,6 @@ import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -183,13 +182,11 @@ public class Controller implements Initializable {
                                 if (Files.isRegularFile(filePath)) {
                                     final String fileName = filePath.toString();
                                     try {
-                                        FileInfo fileInfo = walk.scan(fileName);
+                                        FileInfo fileInfo = walk.checksumMappedFile(fileName);
                                         if (fileInfo != null) {
                                             model.addFile(fileInfo);
                                             calcStatistics(startTimer, fileInfo.size);
                                         }
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
                                     } catch (InterruptedException e) {
                                         if (e.getLocalizedMessage().equals("Stop by User"))
                                             throw new RuntimeException("Stop by User");
@@ -239,12 +236,6 @@ public class Controller implements Initializable {
             public void handle(ActionEvent event) {
                 if (filesWalkThread != null && threadIsActive)
                     filesWalkThread.interrupt();
-//                try {
-//                    filesWalkThread.join();
-//                    resetButtons();
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
             }
         });
     }
