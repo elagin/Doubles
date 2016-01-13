@@ -1,7 +1,9 @@
 package sample;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.prefs.Preferences;
 
 /**
@@ -20,6 +22,8 @@ public class Model {
 
     private Preferences preferences = Preferences.userNodeForPackage(Main.class);
     private List<FileInfo> fileList = new ArrayList<>();
+    private Map<Long, FileInfo> fileMap = new HashMap<>();
+    private SlowDriveCache slowDriveCache = new SlowDriveCache();
 
     public String getFirstFolder() {
         return preferences.get(FIRST_FOLDER, "");
@@ -46,8 +50,17 @@ public class Model {
     }
 
     public void addFile(FileInfo fileInfo) {
-        fileList.add(fileInfo);
-        updateStatistics(fileInfo.size);
+        try {
+            fileList.add(fileInfo);
+            FileInfo old = fileMap.get(fileInfo.crc);
+            if(old != null) {
+                System.out.println("Уже существует " + old.name + " <-> " + fileInfo.name + " CRC: " + fileInfo.crc);
+            }
+            fileMap.put(fileInfo.crc, fileInfo);
+            updateStatistics(fileInfo.size);
+        } catch (Exception ex) {
+            ex.getLocalizedMessage();
+        }
     }
 
     public int getFileProcessed() {
@@ -69,6 +82,7 @@ public class Model {
     public void reset() {
         startTime = System.currentTimeMillis();
         fileList.clear();
+        fileMap.clear();
         totalSize = 0;
         speedBpS = 0;
         totalTime = 0;
@@ -81,5 +95,36 @@ public class Model {
             totalTime = totalTime / 1000;
             speedBpS = totalSize / totalTime;
         }
+    }
+
+    public void checkDupes(FileInfo fileInfo) {
+//        HashMap<Long, Long> hmFiles = new HashMap<Long, Long>();
+//        for(FileInfo item : fileList) {
+//            Long x = hmFiles.get(item.crc);
+//        }
+    }
+
+    public void loadSlow() {
+        slowDriveCache.deserialize();
+    }
+
+    public void saveSlow() {
+        slowDriveCache.serialize();
+    }
+
+    public void addToCache(FileInfo fileInfo) {
+        slowDriveCache.add(fileInfo.name, fileInfo.crc);
+    }
+
+    public int getCacheSize() {
+        return slowDriveCache.size();
+    }
+
+    public Long getCrcFromCache(String name) {
+        return slowDriveCache.getCrc(name);
+    }
+
+    public String getFileNameFromCache(Long crc) {
+        return slowDriveCache.getFileName(crc);
     }
 }

@@ -22,7 +22,6 @@ public class Walk {
             fileChannel = inputStream.getChannel();
             int len = (int) fileChannel.size();
             MappedByteBuffer buffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, len);
-
             for (int cnt = 0; cnt < len; cnt++) {
                 int i = buffer.get(cnt);
                 crc.update(i);

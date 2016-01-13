@@ -12,4 +12,13 @@ public class Utils {
         int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
         return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
+
+    public static String workTimeToString(long start) {
+        long totalTime = System.currentTimeMillis() - start;
+        if(totalTime > 1000)
+            totalTime = totalTime / 1000;
+        else
+            totalTime = 0;
+        return String.format("Общее время %d сек.", totalTime);
+    }
 }
