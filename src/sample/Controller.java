@@ -59,15 +59,10 @@ public class Controller implements Initializable {
     // MODEL
     private final Model model = new Model();
 
-    int fileProcessed = 0;
-    long totalSize = 0;
-    long speedBpS = 0;
-    long totalTime = 0;
+    private boolean threadIsActive = false;
 
-    boolean threadIsActive = false;
-
-    Walk walk = new Walk();
-    Thread filesWalkThread = null;
+    private Walk walk = new Walk();
+    private Thread filesWalkThread = null;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -172,20 +167,22 @@ public class Controller implements Initializable {
                 startButton.setDisable(true);
                 stopButton.setDisable(false);
                 saveFields();
+                model.reset();
 
                 Task task = new Task<Void>() {
                     @Override
                     public Void call() throws Exception {
+
                         try {
                             long startTimer = System.currentTimeMillis();
                             Files.walk(Paths.get(firstFolderField.getText())).forEach(filePath -> {
                                 if (Files.isRegularFile(filePath)) {
                                     final String fileName = filePath.toString();
+
                                     try {
                                         FileInfo fileInfo = walk.checksumMappedFile(fileName);
                                         if (fileInfo != null) {
                                             model.addFile(fileInfo);
-                                            calcStatistics(startTimer, fileInfo.size);
                                         }
                                     } catch (InterruptedException e) {
                                         if (e.getLocalizedMessage().equals("Stop by User"))
@@ -193,12 +190,13 @@ public class Controller implements Initializable {
                                         else
                                             e.printStackTrace();
                                     }
+
                                     Platform.runLater(new Runnable() {
                                         @Override
                                         public void run() {
                                             curentFileLabel.setText(fileName);
-                                            totalFilesField.setText("Обработано " + fileProcessed + " файлов.");
-                                            totalBytesField.setText("Общий объем " + readableFileSize(totalSize) + " Общее время \t" + totalTime + " сек. Скорость: " + readableFileSize(speedBpS) + " / сек.");
+                                            totalFilesField.setText("Обработано " + model.getFileProcessed() + " файлов.");
+                                            totalBytesField.setText("Общий объем " + readableFileSize(model.getTotalSize()) + " Общее время \t" + model.getTotalTime() + " сек. Скорость: " + readableFileSize(model.getSpeedBpS()) + " / сек.");
                                         }
                                     });
                                 }
@@ -212,6 +210,7 @@ public class Controller implements Initializable {
                         } finally {
                             resetButtons();
                         }
+
                         return null;
                     }
                 };
@@ -238,17 +237,5 @@ public class Controller implements Initializable {
                     filesWalkThread.interrupt();
             }
         });
-    }
-
-    private void calcStatistics(long startTimer, long fileSize) {
-        totalSize += fileSize;
-        fileProcessed++;
-        totalTime = System.currentTimeMillis() - startTimer;
-        if (totalTime > 1000) {
-            totalTime = totalTime / 1000;
-            speedBpS = totalSize / totalTime;
-        } else {
-            speedBpS = totalSize / totalTime;
-        }
     }
 }

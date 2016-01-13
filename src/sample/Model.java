@@ -9,12 +9,17 @@ import java.util.prefs.Preferences;
  */
 public class Model {
 
-    final String FIRST_FOLDER = "firstFolder";
-    final String SECOND_FOLDER = "secondFolder";
-    final String DESTINATION_FOLDER = "destFolder";
+    private final String FIRST_FOLDER = "firstFolder";
+    private final String SECOND_FOLDER = "secondFolder";
+    private final String DESTINATION_FOLDER = "destFolder";
 
-    Preferences preferences = Preferences.userNodeForPackage(Main.class);
-    List<FileInfo> fileList = new ArrayList<>();
+    private long totalSize = 0;
+    private long speedBpS = 0;
+    private long totalTime = 0;
+    private long startTime = 0;
+
+    private Preferences preferences = Preferences.userNodeForPackage(Main.class);
+    private List<FileInfo> fileList = new ArrayList<>();
 
     public String getFirstFolder() {
         return preferences.get(FIRST_FOLDER, "");
@@ -42,6 +47,41 @@ public class Model {
 
     public void addFile(FileInfo fileInfo) {
         fileList.add(fileInfo);
+        updateStatistics(fileInfo.size);
     }
 
+    public int getFileProcessed() {
+        return fileList.size();
+    }
+
+    public long getSpeedBpS() {
+        return speedBpS;
+    }
+
+    public long getTotalTime() {
+        return totalTime;
+    }
+
+    public long getTotalSize() {
+        return totalSize;
+    }
+
+    public void reset() {
+        startTime =  System.currentTimeMillis();
+        fileList.clear();
+        totalSize = 0;
+        speedBpS = 0;
+        totalTime = 0;
+    }
+
+    protected void updateStatistics(long fileSize) {
+        totalSize += fileSize;
+        this.totalTime = System.currentTimeMillis() - startTime;
+        if (totalTime > 1000) {
+            totalTime = totalTime / 1000;
+            speedBpS = totalSize / totalTime;
+        } else {
+            speedBpS = totalSize / totalTime;
+        }
+    }
 }
