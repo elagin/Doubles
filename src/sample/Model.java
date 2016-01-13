@@ -1,5 +1,7 @@
 package sample;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 /**
@@ -12,6 +14,7 @@ public class Model {
     final String DESTINATION_FOLDER = "destFolder";
 
     Preferences preferences = Preferences.userNodeForPackage(Main.class);
+    List<FileInfo> fileList = new ArrayList<>();
 
     public String getFirstFolder() {
         return preferences.get(FIRST_FOLDER, "");
@@ -35,6 +38,10 @@ public class Model {
 
     public void setDestFolder(String value) {
         preferences.put(DESTINATION_FOLDER, value);
+    }
+
+    public void addFile(FileInfo fileInfo) {
+        fileList.add(fileInfo);
     }
 
 }

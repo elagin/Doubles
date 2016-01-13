@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import static sample.Utils.readableFileSize;
@@ -28,6 +26,9 @@ public class Controller implements Initializable {
 
     @FXML
     private Button startButton;
+
+    @FXML
+    private Button stopButton;
 
     @FXML
     private TextField firstFolderField;
@@ -64,17 +65,21 @@ public class Controller implements Initializable {
     long speedBpS = 0;
     long totalTime = 0;
 
+    boolean threadIsActive = false;
+
     Walk walk = new Walk();
-    List<FileInfo> fileList = new ArrayList<>();
+    Thread filesWalkThread = null;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         bindStartButtonEvents();
+        bindStopButtonEvents();
         bindBrowseButtonsEvents();
         initFields();
     }
 
     private void initFields() {
+        stopButton.setDisable(true);
         firstFolderField.setText(model.getFirstFolder());
         secondFolderField.setText(model.getSecondFolder());
         destFolderField.setText(model.getDestFolder());
@@ -158,58 +163,101 @@ public class Controller implements Initializable {
     }
 
     /**
-     * binds events to the start button. by pressing the start button, the game
-     * is initialized and the timeline execution is started.
+     * binds events to the start button.
      */
     private void bindStartButtonEvents() {
         startButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 System.out.println("Старт");
+                startButton.setDisable(true);
+                stopButton.setDisable(false);
                 saveFields();
+
                 Task task = new Task<Void>() {
                     @Override
                     public Void call() throws Exception {
-                        long startTimer = System.currentTimeMillis();
-                        //walkin(new File(firstFolder));
-                        Files.walk(Paths.get(firstFolderField.getText())).forEach(filePath -> {
-                            if (Files.isRegularFile(filePath)) {
-                                final String fileName = filePath.toString();
-                                try {
-                                    FileInfo fileInfo = walk.scan(fileName);
-                                    if (fileInfo != null) {
-                                        fileList.add(fileInfo);
-
-                                        totalSize += fileInfo.size;
-                                        fileProcessed++;
-                                        totalTime = System.currentTimeMillis() - startTimer;
-                                        if (totalTime > 1000) {
-                                            totalTime = totalTime / 1000;
-                                            speedBpS = totalSize / totalTime;
-                                        } else {
-                                            speedBpS = totalSize / totalTime;
+                        try {
+                            long startTimer = System.currentTimeMillis();
+                            Files.walk(Paths.get(firstFolderField.getText())).forEach(filePath -> {
+                                if (Files.isRegularFile(filePath)) {
+                                    final String fileName = filePath.toString();
+                                    try {
+                                        FileInfo fileInfo = walk.scan(fileName);
+                                        if (fileInfo != null) {
+                                            model.addFile(fileInfo);
+                                            calcStatistics(startTimer, fileInfo.size);
                                         }
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    } catch (InterruptedException e) {
+                                        if (e.getLocalizedMessage().equals("Stop by User"))
+                                            throw new RuntimeException("Stop by User");
+                                        else
+                                            e.printStackTrace();
                                     }
-                                } catch (IOException e) {
-                                    e.printStackTrace();
+                                    Platform.runLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            curentFileLabel.setText(fileName);
+                                            totalFilesField.setText("Обработано " + fileProcessed + " файлов.");
+                                            totalBytesField.setText("Общий объем " + readableFileSize(totalSize) + " Общее время \t" + totalTime + " сек. Скорость: " + readableFileSize(speedBpS) + " / сек.");
+                                        }
+                                    });
                                 }
-                                Platform.runLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        curentFileLabel.setText(fileName);
-                                        totalFilesField.setText("Обработано " + fileProcessed + " файлов.");
-                                        totalBytesField.setText("Общий объем " + readableFileSize(totalSize) + " Общее время \t" + totalTime + " сек. Скорость: " + readableFileSize(speedBpS) + " / сек.");
-                                    }
-                                });
-                            }
-                        });
+                            });
+
+                        } catch (RuntimeException e) {
+                            if (e.getLocalizedMessage().equals("Stop by User"))
+                                System.out.println(e.getLocalizedMessage());
+                            else
+                                e.printStackTrace();
+                        } finally {
+                            resetButtons();
+                        }
                         return null;
                     }
                 };
-                Thread th = new Thread(task);
-                th.setDaemon(true);
-                th.start();
+                filesWalkThread = new Thread(task);
+                filesWalkThread.setDaemon(true);
+                filesWalkThread.start();
+                threadIsActive = true;
             }
         });
+    }
+
+    private void resetButtons() {
+        System.out.println("Стоп");
+        threadIsActive = false;
+        startButton.setDisable(false);
+        stopButton.setDisable(true);
+    }
+
+    private void bindStopButtonEvents() {
+        stopButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if (filesWalkThread != null && threadIsActive)
+                    filesWalkThread.interrupt();
+//                try {
+//                    filesWalkThread.join();
+//                    resetButtons();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+            }
+        });
+    }
+
+    private void calcStatistics(long startTimer, long fileSize) {
+        totalSize += fileSize;
+        fileProcessed++;
+        totalTime = System.currentTimeMillis() - startTimer;
+        if (totalTime > 1000) {
+            totalTime = totalTime / 1000;
+            speedBpS = totalSize / totalTime;
+        } else {
+            speedBpS = totalSize / totalTime;
+        }
     }
 }

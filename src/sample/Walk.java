@@ -5,9 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
+import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.zip.CRC32;
@@ -24,7 +23,7 @@ public class Walk {
     long totalSize = 0;
     long speedBpS = 0;
 
-    public FileInfo scan(String fileName) throws IOException {
+    public FileInfo scan(String fileName) throws IOException, InterruptedException {
 //        long startTimer = System.currentTimeMillis();
 //        Files.walk(Paths.get(dir)).forEach(filePath -> {
 //            if (Files.isRegularFile(filePath)) {
@@ -82,7 +81,7 @@ public class Walk {
         return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 
-    public FileInfo getCheckSumFile(String filepath) {
+    public FileInfo getCheckSumFile(String filepath) throws InterruptedException {
         //System.out.print(cutFileName(filepath));
         return checksumMappedFile(filepath);
         //long start_timer = System.currentTimeMillis();
@@ -119,7 +118,7 @@ public class Walk {
 */
     }
 
-    public FileInfo checksumMappedFile(String filepath) {
+    public FileInfo checksumMappedFile(String filepath) throws InterruptedException {
         FileInputStream inputStream = null;
         FileChannel fileChannel = null;
         CRC32 crc = new CRC32();
@@ -138,16 +137,20 @@ public class Walk {
         } catch (FileNotFoundException e) {
             System.out.print("name: " + filepath);
             e.printStackTrace();
+        } catch (ClosedByInterruptException e) {
+            throw new InterruptedException("Stop by User");
+        } catch (IOException e) {
+            System.out.print(e.getLocalizedMessage() + filepath);
+            e.printStackTrace();
         } catch (OutOfMemoryError e) {
 //            MemoryUsage heapUsage = memoryBean.getHeapMemoryUsage();
 //            long maxMemory = heapUsage.getMax() / MEGABYTE;
 //            long usedMemory = heapUsage.getUsed() / MEGABYTE;
 //            System.out.println(i + " : Memory Use :" + usedMemory + "M/" + maxMemory + "M");
             System.out.print("Очень большой файл: " + filepath);
-        } catch (IOException e) {
-            System.out.print("name: " + filepath);
-            e.printStackTrace();
-
+//        } catch (IOException e) {
+//            System.out.print("name: " + filepath);
+//            e.printStackTrace();
         } finally {
             if (fileChannel != null)
                 try {

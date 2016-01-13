@@ -1,9 +1,7 @@
 package sample;
 
-import com.sun.javafx.font.freetype.HBGlyphLayout;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -17,7 +15,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -26,19 +23,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.prefs.Preferences;
 
 import static sample.Utils.readableFileSize;
 
 public class Main extends Application {
 
     Walk walk = new Walk();
-    //Preferences preferences = Preferences.userNodeForPackage(Main.class);
-
-    List<FileInfo> fileList = new ArrayList<>();
 
     int fileProcessed = 0;
     long totalSize = 0;
@@ -190,6 +180,8 @@ public class Main extends Application {
                                         }
                                     }
                                 } catch (IOException e) {
+                                    e.printStackTrace();
+                                } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
                                 Platform.runLater(new Runnable() {
