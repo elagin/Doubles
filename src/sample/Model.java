@@ -67,7 +67,7 @@ public class Model {
     }
 
     public void reset() {
-        startTime =  System.currentTimeMillis();
+        startTime = System.currentTimeMillis();
         fileList.clear();
         totalSize = 0;
         speedBpS = 0;
@@ -79,8 +79,6 @@ public class Model {
         this.totalTime = System.currentTimeMillis() - startTime;
         if (totalTime > 1000) {
             totalTime = totalTime / 1000;
-            speedBpS = totalSize / totalTime;
-        } else {
             speedBpS = totalSize / totalTime;
         }
     }
