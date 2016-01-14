@@ -23,6 +23,8 @@
                                 text="Обзор..."/>
                         <Button fx:id="scanSecondFolder" alignment="CENTER_RIGHT" mnemonicParsing="false"
                                 text="Сканирование"/>
+                        <Button fx:id="stopScanSecondFolder" alignment="CENTER_RIGHT" mnemonicParsing="false"
+                                text="Стоп"/>
                     </children>
                 </HBox>
                 <HBox alignment="TOP_CENTER" prefHeight="-1.0" prefWidth="-1.0">

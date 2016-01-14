@@ -112,7 +112,7 @@ public class Model {
         slowDriveCache.serialize();
     }
 
-    public void addToCache(FileInfo fileInfo) {
+    public void cacheAdd(FileInfo fileInfo) {
         slowDriveCache.add(fileInfo.name, fileInfo.crc);
         updateStatistics(fileInfo.size);
     }
@@ -121,7 +121,7 @@ public class Model {
         return slowDriveCache.size();
     }
 
-    public Long getCrcFromCache(String name) {
+    public Long getCacheCrc(String name) {
         return slowDriveCache.getCrc(name);
     }
 

@@ -11,6 +11,7 @@ import javafx.stage.DirectoryChooser;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.channels.ClosedByInterruptException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -60,15 +61,21 @@ public class Controller implements Initializable {
     private Button scanSecondFolder;
 
     @FXML
+    private Button stopScanSecondFolder;
+
+    @FXML
     private Button checkButton;
 
     // MODEL
     private final Model model = new Model();
 
     private boolean threadIsActive = false;
+    private boolean threadSlowIsActive = false;
 
     private Walk walk = new Walk();
+
     private Thread filesWalkThread = null;
+    private Thread slowWalkThread = null;
 
     private long startFilelistTimer;
 
@@ -76,6 +83,7 @@ public class Controller implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         bindStartButtonEvents();
         bindStopButtonEvents();
+        bindStopSlowButtonEvents();
         bindBrowseButtonsEvents();
         bindScanButtonsEvents();
         bindCheckButtonEvents();
@@ -86,6 +94,7 @@ public class Controller implements Initializable {
 
     private void initFields() {
         stopButton.setDisable(true);
+        stopScanSecondFolder.setDisable(true);
         firstFolderField.setText(model.getFirstFolder());
         secondFolderField.setText(model.getSecondFolder());
         destFolderField.setText(model.getDestFolder());
@@ -230,11 +239,20 @@ public class Controller implements Initializable {
         });
     }
 
+    private void bindStopSlowButtonEvents() {
+        stopScanSecondFolder.setOnAction(event -> {
+            if (slowWalkThread != null && threadSlowIsActive)
+                slowWalkThread.interrupt();
+            threadSlowIsActive = false;
+        });
+    }
+
     private void bindScanButtonsEvents() {
         scanSecondFolder.setOnAction(event -> {
-            System.out.println("Старт second folder");
+            System.out.println("Старт обзора папки");
             model.setSecondFolder(secondFolderField.getText());
             startFilelistTimer = System.currentTimeMillis();
+            stopScanSecondFolder.setDisable(false);
             //startButton.setDisable(true);
             //stopButton.setDisable(false);
             //saveFields();
@@ -246,32 +264,50 @@ public class Controller implements Initializable {
                     List<String> fileList = new ArrayList<>();
                     try {
                         Files.walk(Paths.get(secondFolderField.getText())).forEach(filePath -> {
+//                            try {
                             if (Files.isRegularFile(filePath)) {
+//                                if(!threadSlowIsActive)
+//                                    throw new RuntimeException("Stop by User");
                                 String fileName = filePath.toString();
                                 fileList.add(fileName);
+
                                 Platform.runLater(() -> {
                                     curentFileLabel.setText(fileName);
                                     totalFilesField.setText("Обработано " + fileList.size() + " файлов.");
                                     totalBytesField.setText(Utils.workTimeToString(startFilelistTimer));
                                 });
                             }
+//                            } catch (InterruptedException e) {
+//                                if (e.getLocalizedMessage().equals("Stop by User"))
+//                                    throw new RuntimeException("Stop by User");
+//                                else
+//                                    e.printStackTrace();
+//                            } catch (Exception e) {
+//                                e.getLocalizedMessage();
+//                            }
                         });
+                    } catch (ClosedByInterruptException e) {
+                        throw new InterruptedException("Stop by User");
                     } catch (RuntimeException e) {
                         if (e.getLocalizedMessage().equals("Stop by User"))
                             System.out.println(e.getLocalizedMessage());
                         else
                             e.printStackTrace();
                     } finally {
-                        System.out.println("Обработано " + fileList.size() + " файлов за" + Utils.workTimeToString(startFilelistTimer));
-                        scanSecondFolder(fileList);
+                        System.out.println("Обзор папки завершен, обработано " + fileList.size() + " файлов за" + Utils.workTimeToString(startFilelistTimer));
+                        if (threadSlowIsActive)
+                            scanSecondFolder(fileList);
+                        //threadSlowIsActive = false;
+                        stopScanSecondFolder.setDisable(true);
                     }
                     return null;
                 }
             };
-            filesWalkThread = new Thread(task);
-            filesWalkThread.setDaemon(true);
-            filesWalkThread.start();
-            //threadIsActive = true;
+
+            slowWalkThread = new Thread(task);
+            slowWalkThread.setDaemon(true);
+            slowWalkThread.start();
+            threadSlowIsActive = true;
         });
     }
 
@@ -280,26 +316,29 @@ public class Controller implements Initializable {
         System.out.println("Start scanSecondFolder");
         model.reset();
         for (String fileName : fileList) {
-            try {
-                FileInfo fileInfo = walk.checksumMappedFile(fileName);
-                if (fileInfo != null) {
-                    model.addToCache(fileInfo);
-                    Platform.runLater(() -> {
-                        curentFileLabel.setText(fileName);
-                        totalFilesField.setText("Обработано " + model.getCacheSize() + " файлов.");
-                        //totalBytesField.setText(Utils.workTimeToString(startFilelistTimer));
-                        totalBytesField.setText("Общий объем " + readableFileSize(model.getTotalSize()) + " Общее время \t" + model.getTotalTime() + " сек. Скорость: " + readableFileSize(model.getSpeedBpS()) + " / сек.");
-                    });
+            if (model.getCacheCrc(fileName) == null) { //Добавляем только отсутствующие файлы
+                try {
+                    FileInfo fileInfo = walk.checksumMappedFile(fileName);
+                    if (fileInfo != null) {
+                        model.cacheAdd(fileInfo);
+
+                        Platform.runLater(() -> {
+                            curentFileLabel.setText(fileName);
+                            totalFilesField.setText("Обработано " + model.getCacheSize() + " файлов.");
+                            //totalBytesField.setText(Utils.workTimeToString(startFilelistTimer));
+                            totalBytesField.setText("Общий объем " + readableFileSize(model.getTotalSize()) + " Общее время \t" + model.getTotalTime() + " сек. Скорость: " + readableFileSize(model.getSpeedBpS()) + " / сек.");
+                        });
+
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
         System.out.println("Stop scanSecondFolder");
         System.out.println(Utils.workTimeToString(startTimer));
         model.saveSlow();
     }
-
 
     private void bindCheckButtonEvents() {
         checkButton.setOnAction(event -> {
@@ -326,11 +365,13 @@ public class Controller implements Initializable {
                                     if (oldFileName != null)
                                         System.out.println(String.format("cached: %s <-> %s", oldFileName, fileName));
                                     processedFiles[0]++;
+
                                     Platform.runLater(() -> {
                                         curentFileLabel.setText(fileName);
                                         totalFilesField.setText("Обработано " + processedFiles[0] + " файлов.");
                                         totalBytesField.setText(Utils.workTimeToString(startFilelistTimer));
                                     });
+
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
@@ -347,6 +388,7 @@ public class Controller implements Initializable {
                     return null;
                 }
             };
+
             filesWalkThread = new Thread(task);
             filesWalkThread.setDaemon(true);
             filesWalkThread.start();
