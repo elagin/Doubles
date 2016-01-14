@@ -72,7 +72,7 @@ public class Controller implements Initializable {
     private Walk walk = new Walk();
     private Thread filesWalkThread = null;
 
-    long startFilelistTimer;
+    private long startFilelistTimer;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -288,7 +288,7 @@ public class Controller implements Initializable {
                             else
                                 e.printStackTrace();
                         } finally {
-                            System.out.println("Обработано " + fileList.size() + " файлов.");
+                            System.out.println("Обработано " + fileList.size() + " файлов за" + Utils.workTimeToString(startFilelistTimer));
                             scanSecondFolder(fileList);
                         }
                         return null;
@@ -316,6 +316,7 @@ public class Controller implements Initializable {
                             curentFileLabel.setText(fileName);
                             totalFilesField.setText("Обработано " + model.getCacheSize() + " файлов.");
                             totalBytesField.setText(Utils.workTimeToString(startFilelistTimer));
+                            //totalBytesField.setText("Общий объем " + readableFileSize(model.getTotalSize()) + " Общее время \t" + model.getTotalTime() + " сек. Скорость: " + readableFileSize(model.getSpeedBpS()) + " / сек.");
                         }
                     });
                 }
@@ -333,7 +334,7 @@ public class Controller implements Initializable {
         checkButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                System.out.println("Старт check folder and cach");
+                System.out.println("Старт check folder and cache");
                 //model.setSecondFolder(firstFolderField.getText());
                 startFilelistTimer = System.currentTimeMillis();
                 //startButton.setDisable(true);

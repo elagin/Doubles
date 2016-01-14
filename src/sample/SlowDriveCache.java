@@ -9,11 +9,20 @@ import java.util.Map;
  */
 public class SlowDriveCache {
 
-    private Map<String, Long> map = new HashMap<>();
     private final String fileName = "slow.bin";
+    private final int SAFE_SAVE_THRESHOLD = 100;
+
+    private Map<String, Long> map = new HashMap<>();
+    private int safeThresholdLeft = SAFE_SAVE_THRESHOLD;
 
     public void add(String name, Long crc) {
-        map.put(name, crc);
+        if(safeThresholdLeft == 0) {
+            serialize();
+            safeThresholdLeft = SAFE_SAVE_THRESHOLD;
+        } else {
+            map.put(name, crc);
+            safeThresholdLeft--;
+        }
     }
 
     public Long getCrc(String fileName) {

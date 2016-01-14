@@ -88,7 +88,7 @@ public class Model {
         totalTime = 0;
     }
 
-    protected void updateStatistics(long fileSize) {
+    private void updateStatistics(long fileSize) {
         totalSize += fileSize;
         this.totalTime = System.currentTimeMillis() - startTime;
         if (totalTime > 1000) {
