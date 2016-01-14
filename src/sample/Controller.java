@@ -2,8 +2,6 @@ package sample;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -100,71 +98,62 @@ public class Controller implements Initializable {
     }
 
     private void bindBrowseButtonsEvents() {
-        browseFirstFolder.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                DirectoryChooser directoryChooser = new DirectoryChooser();
-                directoryChooser.setTitle("Выбор первой папки");
-                if (firstFolderField.getText() != null)
-                    directoryChooser.setInitialDirectory(new File(firstFolderField.getText()));
-                try {
-                    File file = directoryChooser.showDialog(null);
-                    if (file != null) {
-                        firstFolderField.setText(file.getPath());
-                    }
-                } catch (IllegalArgumentException ex) {
-                    ex.getLocalizedMessage();
-                    directoryChooser.setInitialDirectory(null);
-                    File file = directoryChooser.showDialog(null);
-                    if (file != null) {
-                        firstFolderField.setText(file.getPath());
-                    }
+        browseFirstFolder.setOnAction(e -> {
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            directoryChooser.setTitle("Выбор первой папки");
+            if (firstFolderField.getText() != null)
+                directoryChooser.setInitialDirectory(new File(firstFolderField.getText()));
+            try {
+                File file = directoryChooser.showDialog(null);
+                if (file != null) {
+                    firstFolderField.setText(file.getPath());
+                }
+            } catch (IllegalArgumentException ex) {
+                ex.getLocalizedMessage();
+                directoryChooser.setInitialDirectory(null);
+                File file = directoryChooser.showDialog(null);
+                if (file != null) {
+                    firstFolderField.setText(file.getPath());
                 }
             }
         });
 
-        browseSecondFolder.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                DirectoryChooser directoryChooser = new DirectoryChooser();
-                directoryChooser.setTitle("Выбор первой папки");
-                if (secondFolderField.getText() != null)
-                    directoryChooser.setInitialDirectory(new File(secondFolderField.getText()));
-                try {
-                    File file = directoryChooser.showDialog(null);
-                    if (file != null) {
-                        secondFolderField.setText(file.getPath());
-                    }
-                } catch (IllegalArgumentException ex) {
-                    ex.getLocalizedMessage();
-                    directoryChooser.setInitialDirectory(null);
-                    File file = directoryChooser.showDialog(null);
-                    if (file != null) {
-                        secondFolderField.setText(file.getPath());
-                    }
+        browseSecondFolder.setOnAction(e -> {
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            directoryChooser.setTitle("Выбор первой папки");
+            if (secondFolderField.getText() != null)
+                directoryChooser.setInitialDirectory(new File(secondFolderField.getText()));
+            try {
+                File file = directoryChooser.showDialog(null);
+                if (file != null) {
+                    secondFolderField.setText(file.getPath());
+                }
+            } catch (IllegalArgumentException ex) {
+                ex.getLocalizedMessage();
+                directoryChooser.setInitialDirectory(null);
+                File file = directoryChooser.showDialog(null);
+                if (file != null) {
+                    secondFolderField.setText(file.getPath());
                 }
             }
         });
 
-        browseDestFolder.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                DirectoryChooser directoryChooser = new DirectoryChooser();
-                directoryChooser.setTitle("Выбор первой папки");
-                if (destFolderField.getText() != null)
-                    directoryChooser.setInitialDirectory(new File(destFolderField.getText()));
-                try {
-                    File file = directoryChooser.showDialog(null);
-                    if (file != null) {
-                        destFolderField.setText(file.getPath());
-                    }
-                } catch (IllegalArgumentException ex) {
-                    ex.getLocalizedMessage();
-                    directoryChooser.setInitialDirectory(null);
-                    File file = directoryChooser.showDialog(null);
-                    if (file != null) {
-                        destFolderField.setText(file.getPath());
-                    }
+        browseDestFolder.setOnAction(e -> {
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            directoryChooser.setTitle("Выбор первой папки");
+            if (destFolderField.getText() != null)
+                directoryChooser.setInitialDirectory(new File(destFolderField.getText()));
+            try {
+                File file = directoryChooser.showDialog(null);
+                if (file != null) {
+                    destFolderField.setText(file.getPath());
+                }
+            } catch (IllegalArgumentException ex) {
+                ex.getLocalizedMessage();
+                directoryChooser.setInitialDirectory(null);
+                File file = directoryChooser.showDialog(null);
+                if (file != null) {
+                    destFolderField.setText(file.getPath());
                 }
             }
         });
@@ -174,62 +163,55 @@ public class Controller implements Initializable {
      * binds events to the start button.
      */
     private void bindStartButtonEvents() {
-        startButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("Старт");
-                startButton.setDisable(true);
-                stopButton.setDisable(false);
-                saveFields();
-                model.reset();
+        startButton.setOnAction(event -> {
+            System.out.println("Старт");
+            startButton.setDisable(true);
+            stopButton.setDisable(false);
+            saveFields();
+            model.reset();
 
-                Task task = new Task<Void>() {
-                    @Override
-                    public Void call() throws Exception {
-                        try {
-                            long startTimer = System.currentTimeMillis();
-                            Files.walk(Paths.get(firstFolderField.getText())).forEach(filePath -> {
-                                if (Files.isRegularFile(filePath)) {
-                                    final String fileName = filePath.toString();
-                                    try {
-                                        FileInfo fileInfo = walk.checksumMappedFile(fileName);
-                                        if (fileInfo != null) {
-                                            model.addFile(fileInfo);
-                                        }
-                                    } catch (InterruptedException e) {
-                                        if (e.getLocalizedMessage().equals("Stop by User"))
-                                            throw new RuntimeException("Stop by User");
-                                        else
-                                            e.printStackTrace();
+            Task task = new Task<Void>() {
+                @Override
+                public Void call() throws Exception {
+                    try {
+                        Files.walk(Paths.get(firstFolderField.getText())).forEach(filePath -> {
+                            if (Files.isRegularFile(filePath)) {
+                                final String fileName = filePath.toString();
+                                try {
+                                    FileInfo fileInfo = walk.checksumMappedFile(fileName);
+                                    if (fileInfo != null) {
+                                        model.addFile(fileInfo);
                                     }
-
-                                    Platform.runLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            curentFileLabel.setText(fileName);
-                                            totalFilesField.setText("Обработано " + model.getFileProcessed() + " файлов.");
-                                            totalBytesField.setText("Общий объем " + readableFileSize(model.getTotalSize()) + " Общее время \t" + model.getTotalTime() + " сек. Скорость: " + readableFileSize(model.getSpeedBpS()) + " / сек.");
-                                        }
-                                    });
+                                } catch (InterruptedException e) {
+                                    if (e.getLocalizedMessage().equals("Stop by User"))
+                                        throw new RuntimeException("Stop by User");
+                                    else
+                                        e.printStackTrace();
                                 }
-                            });
 
-                        } catch (RuntimeException e) {
-                            if (e.getLocalizedMessage().equals("Stop by User"))
-                                System.out.println(e.getLocalizedMessage());
-                            else
-                                e.printStackTrace();
-                        } finally {
-                            resetButtons();
-                        }
-                        return null;
+                                Platform.runLater(() -> {
+                                    curentFileLabel.setText(fileName);
+                                    totalFilesField.setText("Обработано " + model.getFileProcessed() + " файлов.");
+                                    totalBytesField.setText("Общий объем " + readableFileSize(model.getTotalSize()) + " Общее время \t" + model.getTotalTime() + " сек. Скорость: " + readableFileSize(model.getSpeedBpS()) + " / сек.");
+                                });
+                            }
+                        });
+
+                    } catch (RuntimeException e) {
+                        if (e.getLocalizedMessage().equals("Stop by User"))
+                            System.out.println(e.getLocalizedMessage());
+                        else
+                            e.printStackTrace();
+                    } finally {
+                        resetButtons();
                     }
-                };
-                filesWalkThread = new Thread(task);
-                filesWalkThread.setDaemon(true);
-                filesWalkThread.start();
-                threadIsActive = true;
-            }
+                    return null;
+                }
+            };
+            filesWalkThread = new Thread(task);
+            filesWalkThread.setDaemon(true);
+            filesWalkThread.start();
+            threadIsActive = true;
         });
     }
 
@@ -242,63 +224,54 @@ public class Controller implements Initializable {
     }
 
     private void bindStopButtonEvents() {
-        stopButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                if (filesWalkThread != null && threadIsActive)
-                    filesWalkThread.interrupt();
-            }
+        stopButton.setOnAction(event -> {
+            if (filesWalkThread != null && threadIsActive)
+                filesWalkThread.interrupt();
         });
     }
 
     private void bindScanButtonsEvents() {
-        scanSecondFolder.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("Старт second folder");
-                model.setSecondFolder(secondFolderField.getText());
-                startFilelistTimer = System.currentTimeMillis();
-                //startButton.setDisable(true);
-                //stopButton.setDisable(false);
-                //saveFields();
-                //model.reset();
+        scanSecondFolder.setOnAction(event -> {
+            System.out.println("Старт second folder");
+            model.setSecondFolder(secondFolderField.getText());
+            startFilelistTimer = System.currentTimeMillis();
+            //startButton.setDisable(true);
+            //stopButton.setDisable(false);
+            //saveFields();
+            //model.reset();
 
-                Task task = new Task<Void>() {
-                    @Override
-                    public Void call() throws Exception {
-                        List<String> fileList = new ArrayList<>();
-                        try {
-                            Files.walk(Paths.get(secondFolderField.getText())).forEach(filePath -> {
-                                if (Files.isRegularFile(filePath)) {
-                                    String fileName = filePath.toString();
-                                    fileList.add(fileName);
-                                    Platform.runLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            curentFileLabel.setText(fileName);
-                                            totalFilesField.setText("Обработано " + fileList.size() + " файлов.");
-                                            totalBytesField.setText(Utils.workTimeToString(startFilelistTimer));
-                                        }
-                                    });
-                                }
-                            });
-                        } catch (RuntimeException e) {
-                            if (e.getLocalizedMessage().equals("Stop by User"))
-                                System.out.println(e.getLocalizedMessage());
-                            else
-                                e.printStackTrace();
-                        } finally {
-                            System.out.println("Обработано " + fileList.size() + " файлов за" + Utils.workTimeToString(startFilelistTimer));
-                            scanSecondFolder(fileList);
-                        }
-                        return null;
+            Task task = new Task<Void>() {
+                @Override
+                public Void call() throws Exception {
+                    List<String> fileList = new ArrayList<>();
+                    try {
+                        Files.walk(Paths.get(secondFolderField.getText())).forEach(filePath -> {
+                            if (Files.isRegularFile(filePath)) {
+                                String fileName = filePath.toString();
+                                fileList.add(fileName);
+                                Platform.runLater(() -> {
+                                    curentFileLabel.setText(fileName);
+                                    totalFilesField.setText("Обработано " + fileList.size() + " файлов.");
+                                    totalBytesField.setText(Utils.workTimeToString(startFilelistTimer));
+                                });
+                            }
+                        });
+                    } catch (RuntimeException e) {
+                        if (e.getLocalizedMessage().equals("Stop by User"))
+                            System.out.println(e.getLocalizedMessage());
+                        else
+                            e.printStackTrace();
+                    } finally {
+                        System.out.println("Обработано " + fileList.size() + " файлов за" + Utils.workTimeToString(startFilelistTimer));
+                        scanSecondFolder(fileList);
                     }
-                };
-                filesWalkThread = new Thread(task);
-                filesWalkThread.setDaemon(true);
-                filesWalkThread.start();
-                //threadIsActive = true;
-            }
+                    return null;
+                }
+            };
+            filesWalkThread = new Thread(task);
+            filesWalkThread.setDaemon(true);
+            filesWalkThread.start();
+            //threadIsActive = true;
         });
     }
 
@@ -311,14 +284,11 @@ public class Controller implements Initializable {
                 FileInfo fileInfo = walk.checksumMappedFile(fileName);
                 if (fileInfo != null) {
                     model.addToCache(fileInfo);
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            curentFileLabel.setText(fileName);
-                            totalFilesField.setText("Обработано " + model.getCacheSize() + " файлов.");
-                            //totalBytesField.setText(Utils.workTimeToString(startFilelistTimer));
-                            totalBytesField.setText("Общий объем " + readableFileSize(model.getTotalSize()) + " Общее время \t" + model.getTotalTime() + " сек. Скорость: " + readableFileSize(model.getSpeedBpS()) + " / сек.");
-                        }
+                    Platform.runLater(() -> {
+                        curentFileLabel.setText(fileName);
+                        totalFilesField.setText("Обработано " + model.getCacheSize() + " файлов.");
+                        //totalBytesField.setText(Utils.workTimeToString(startFilelistTimer));
+                        totalBytesField.setText("Общий объем " + readableFileSize(model.getTotalSize()) + " Общее время \t" + model.getTotalTime() + " сек. Скорость: " + readableFileSize(model.getSpeedBpS()) + " / сек.");
                     });
                 }
             } catch (InterruptedException e) {
@@ -332,62 +302,55 @@ public class Controller implements Initializable {
 
 
     private void bindCheckButtonEvents() {
-        checkButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("Старт check folder and cache");
-                //model.setSecondFolder(firstFolderField.getText());
-                startFilelistTimer = System.currentTimeMillis();
-                //startButton.setDisable(true);
-                //stopButton.setDisable(false);
-                //saveFields();
-                //model.reset();
+        checkButton.setOnAction(event -> {
+            System.out.println("Старт check folder and cache");
+            //model.setSecondFolder(firstFolderField.getText());
+            startFilelistTimer = System.currentTimeMillis();
+            //startButton.setDisable(true);
+            //stopButton.setDisable(false);
+            //saveFields();
+            //model.reset();
 
-                Task task = new Task<Void>() {
-                    @Override
-                    public Void call() throws Exception {
-                        //List<String> fileList = new ArrayList<>();
-                        final long[] processedFiles = {0};
-                        try {
-                            Files.walk(Paths.get(firstFolderField.getText())).forEach(filePath -> {
-                                if (Files.isRegularFile(filePath)) {
-                                    String fileName = filePath.toString();
-                                    try {
-                                        FileInfo fileInfo = walk.checksumMappedFile(fileName);
-                                        String oldFileName = model.getFileNameFromCache(fileInfo.crc);
-                                        if (oldFileName != null)
-                                            System.out.println(String.format("cached: %s <-> %s", oldFileName, fileName));
-                                        processedFiles[0]++;
-                                        Platform.runLater(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                curentFileLabel.setText(fileName);
-                                                totalFilesField.setText("Обработано " + processedFiles[0] + " файлов.");
-                                                totalBytesField.setText(Utils.workTimeToString(startFilelistTimer));
-                                            }
-                                        });
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
+            Task task = new Task<Void>() {
+                @Override
+                public Void call() throws Exception {
+                    //List<String> fileList = new ArrayList<>();
+                    final long[] processedFiles = {0};
+                    try {
+                        Files.walk(Paths.get(firstFolderField.getText())).forEach(filePath -> {
+                            if (Files.isRegularFile(filePath)) {
+                                String fileName = filePath.toString();
+                                try {
+                                    FileInfo fileInfo = walk.checksumMappedFile(fileName);
+                                    String oldFileName = model.getFileNameFromCache(fileInfo.crc);
+                                    if (oldFileName != null)
+                                        System.out.println(String.format("cached: %s <-> %s", oldFileName, fileName));
+                                    processedFiles[0]++;
+                                    Platform.runLater(() -> {
+                                        curentFileLabel.setText(fileName);
+                                        totalFilesField.setText("Обработано " + processedFiles[0] + " файлов.");
+                                        totalBytesField.setText(Utils.workTimeToString(startFilelistTimer));
+                                    });
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
                                 }
-                            });
-                        } catch (RuntimeException e) {
-                            if (e.getLocalizedMessage().equals("Stop by User"))
-                                System.out.println(e.getLocalizedMessage());
-                            else
-                                e.printStackTrace();
-                        } finally {
-                            System.out.println("Обработано " + processedFiles[0] + " файлов.");
-                        }
-                        return null;
+                            }
+                        });
+                    } catch (RuntimeException e) {
+                        if (e.getLocalizedMessage().equals("Stop by User"))
+                            System.out.println(e.getLocalizedMessage());
+                        else
+                            e.printStackTrace();
+                    } finally {
+                        System.out.println("Обработано " + processedFiles[0] + " файлов.");
                     }
-                };
-                filesWalkThread = new Thread(task);
-                filesWalkThread.setDaemon(true);
-                filesWalkThread.start();
-                //threadIsActive = true;
-            }
+                    return null;
+                }
+            };
+            filesWalkThread = new Thread(task);
+            filesWalkThread.setDaemon(true);
+            filesWalkThread.start();
+            //threadIsActive = true;
         });
     }
-
 }

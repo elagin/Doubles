@@ -26,8 +26,7 @@ public class Walk {
                 int i = buffer.get(cnt);
                 crc.update(i);
             }
-            FileInfo fileInfo = new FileInfo(crc.getValue(), len, filepath);
-            return fileInfo;
+            return new FileInfo(crc.getValue(), len, filepath);
         } catch (FileNotFoundException e) {
             System.out.print("name: " + filepath);
             e.printStackTrace();
