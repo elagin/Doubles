@@ -305,6 +305,7 @@ public class Controller implements Initializable {
     private void scanSecondFolder(List<String> fileList) {
         long startTimer = System.currentTimeMillis();
         System.out.println("Start scanSecondFolder");
+        model.reset();
         for (String fileName : fileList) {
             try {
                 FileInfo fileInfo = walk.checksumMappedFile(fileName);
@@ -315,8 +316,8 @@ public class Controller implements Initializable {
                         public void run() {
                             curentFileLabel.setText(fileName);
                             totalFilesField.setText("Обработано " + model.getCacheSize() + " файлов.");
-                            totalBytesField.setText(Utils.workTimeToString(startFilelistTimer));
-                            //totalBytesField.setText("Общий объем " + readableFileSize(model.getTotalSize()) + " Общее время \t" + model.getTotalTime() + " сек. Скорость: " + readableFileSize(model.getSpeedBpS()) + " / сек.");
+                            //totalBytesField.setText(Utils.workTimeToString(startFilelistTimer));
+                            totalBytesField.setText("Общий объем " + readableFileSize(model.getTotalSize()) + " Общее время \t" + model.getTotalTime() + " сек. Скорость: " + readableFileSize(model.getSpeedBpS()) + " / сек.");
                         }
                     });
                 }

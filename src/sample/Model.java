@@ -114,6 +114,7 @@ public class Model {
 
     public void addToCache(FileInfo fileInfo) {
         slowDriveCache.add(fileInfo.name, fileInfo.crc);
+        updateStatistics(fileInfo.size);
     }
 
     public int getCacheSize() {
