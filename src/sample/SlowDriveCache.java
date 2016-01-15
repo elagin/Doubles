@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public class SlowDriveCache {
 
-    private final String fileName = "slow.bin";
+    private final String fileName = "slow";
     private final int SAFE_SAVE_THRESHOLD = 100;
 
     private Map<String, Long> map = new HashMap<>();
@@ -31,13 +31,13 @@ public class SlowDriveCache {
 
     public void serialize() {
         try {
-            FileOutputStream fileOut = new FileOutputStream(fileName);
+            FileOutputStream fileOut = new FileOutputStream(fileName + map.size() + ".bin");
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(map);
             out.flush();
             out.close();
             fileOut.close();
-            System.out.println("Сохранено "+ map.size() + " элементов кэша в "+ fileName);
+            //System.out.println("Сохранено "+ map.size() + " элементов кэша в "+ fileName);
         } catch (IOException i) {
             i.printStackTrace();
         }
@@ -45,7 +45,7 @@ public class SlowDriveCache {
 
     public void deserialize() {
         try {
-            FileInputStream fileIn = new FileInputStream(fileName);
+            FileInputStream fileIn = new FileInputStream(fileName + ".bin");
             ObjectInputStream in = new ObjectInputStream(fileIn);
             map = (Map<String, Long>) in.readObject();
             in.close();

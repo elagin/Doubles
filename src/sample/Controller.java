@@ -79,6 +79,8 @@ public class Controller implements Initializable {
 
     private long startFilelistTimer;
 
+    private final long MAX_FILE_SIZE = (long)1024 * 1024 * 1024 * 2;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         bindStartButtonEvents();
@@ -318,17 +320,22 @@ public class Controller implements Initializable {
         for (String fileName : fileList) {
             if (model.getCacheCrc(fileName) == null) { //Добавляем только отсутствующие файлы
                 try {
-                    FileInfo fileInfo = walk.checksumMappedFile(fileName);
-                    if (fileInfo != null) {
-                        model.cacheAdd(fileInfo);
+                    File file = new File(fileName);
+                    if (file.length() < MAX_FILE_SIZE) {
+                        FileInfo fileInfo = walk.checksumMappedFile(fileName);
+                        if (fileInfo != null) {
+                            model.cacheAdd(fileInfo);
 
-                        Platform.runLater(() -> {
-                            curentFileLabel.setText(fileName);
-                            totalFilesField.setText("Обработано " + model.getCacheSize() + " файлов.");
-                            //totalBytesField.setText(Utils.workTimeToString(startFilelistTimer));
-                            totalBytesField.setText("Общий объем " + readableFileSize(model.getTotalSize()) + " Общее время \t" + model.getTotalTime() + " сек. Скорость: " + readableFileSize(model.getSpeedBpS()) + " / сек.");
-                        });
+                            Platform.runLater(() -> {
+                                curentFileLabel.setText(fileName);
+                                totalFilesField.setText("Обработано " + model.getCacheSize() + " файлов.");
+                                //totalBytesField.setText(Utils.workTimeToString(startFilelistTimer));
+                                totalBytesField.setText("Общий объем " + readableFileSize(model.getTotalSize()) + " Общее время \t" + model.getTotalTime() + " сек. Скорость: " + readableFileSize(model.getSpeedBpS()) + " / сек.");
+                            });
 
+                        }
+                    } else {
+                        System.out.println(String.format("Файл %s больше %s", fileName, readableFileSize(MAX_FILE_SIZE)));
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
