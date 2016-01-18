@@ -43,9 +43,9 @@ public class SlowDriveCache {
         }
     }
 
-    public void deserialize() {
+    public void deserialize(String fileName) {
         try {
-            FileInputStream fileIn = new FileInputStream(fileName + ".bin");
+            FileInputStream fileIn = new FileInputStream(fileName);
             ObjectInputStream in = new ObjectInputStream(fileIn);
             map = (Map<String, Long>) in.readObject();
             in.close();
@@ -76,5 +76,22 @@ public class SlowDriveCache {
                 return key;
         }
         return null;
+    }
+
+    public boolean remove(Long crc) {
+        String name = getFileName(crc);
+        if(name != null) {
+            map.remove(name);
+            return true;
+        }
+        return false;
+    }
+
+    public Map.Entry<String, Long> getEntrySet() {
+        return (Map.Entry<String, Long>) (Map.Entry<String, Long>) map.entrySet();
+    }
+
+    public Map<String, Long> getMap() {
+        return map;
     }
 }

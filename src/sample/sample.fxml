@@ -3,62 +3,53 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane id="AnchorPane" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-            minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" xmlns:fx="http://javafx.com/fxml/1"
-            xmlns="http://javafx.com/javafx/2.2" fx:controller="sample.Controller">
-    <children>
-        <VBox layoutX="0.0" layoutY="0.0" prefHeight="25.0" prefWidth="800.0">
-            <children>
-                <HBox alignment="TOP_CENTER" prefHeight="-1.0" prefWidth="-1.0">
-                    <children>
-                        <TextField fx:id="firstFolderField" alignment="CENTER_LEFT" prefWidth="400.0"/>
-                        <Button fx:id="browseFirstFolder" alignment="CENTER_RIGHT" mnemonicParsing="false"
-                                text="Обзор..."/>
-                    </children>
-                </HBox>
-                <HBox alignment="TOP_CENTER" prefHeight="-1.0" prefWidth="-1.0">
-                    <children>
-                        <TextField fx:id="secondFolderField" alignment="CENTER_LEFT" prefWidth="400.0"/>
-                        <Button fx:id="browseSecondFolder" alignment="CENTER_RIGHT" mnemonicParsing="false"
-                                text="Обзор..."/>
-                        <Button fx:id="scanSecondFolder" alignment="CENTER_RIGHT" mnemonicParsing="false"
-                                text="Сканирование"/>
-                        <Button fx:id="stopScanSecondFolder" alignment="CENTER_RIGHT" mnemonicParsing="false"
-                                text="Стоп"/>
-                    </children>
-                </HBox>
-                <HBox alignment="TOP_CENTER" prefHeight="-1.0" prefWidth="-1.0">
-                    <children>
-                        <TextField fx:id="destFolderField" alignment="CENTER_LEFT" prefWidth="400.0"/>
-                        <Button fx:id="browseDestFolder" alignment="CENTER_RIGHT" mnemonicParsing="false"
-                                text="Обзор..."/>
-                    </children>
-                </HBox>
-                <HBox alignment="TOP_CENTER" prefHeight="-1.0" prefWidth="-1.0">
-                    <children>
-                        <Button fx:id="startButton" alignment="CENTER_RIGHT" mnemonicParsing="false" text="Старт"/>
-                        <Button fx:id="stopButton" alignment="CENTER_RIGHT" mnemonicParsing="false" text="Стоп"/>
-                        <Button fx:id="checkButton" alignment="CENTER_RIGHT" mnemonicParsing="false" text="Проверить"/>
-                    </children>
-                </HBox>
-                <HBox alignment="CENTER_LEFT" prefHeight="-1.0" prefWidth="-1.0">
-                    <children>
-                        <VBox alignment="CENTER_LEFT" fillWidth="true" minWidth="-1.0" prefHeight="-1.0"
-                              prefWidth="-1.0" snapToPixel="true">
-                            <children>
-                                <Label fx:id="curentFileLabel" alignment="BOTTOM_LEFT" prefWidth="-1.0" text="Файл:"
-                                       underline="false"/>
-                                <Label fx:id="totalFilesField" alignment="BOTTOM_LEFT" prefWidth="-1.0"
-                                       text="Обработано файлов: "/>
-                                <Label fx:id="totalBytesField" prefWidth="-1.0" text="Обработано байт:"/>
-                            </children>
-                        </VBox>
-                    </children>
-                </HBox>
-            </children>
-        </VBox>
-    </children>
-    <padding>
-        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-    </padding>
+<AnchorPane id="AnchorPane" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="sample.Controller">
+  <children>
+    <VBox layoutX="0.0" layoutY="0.0" prefHeight="25.0" prefWidth="800.0">
+      <children>
+        <HBox alignment="TOP_CENTER" prefHeight="-1.0" prefWidth="-1.0">
+          <children>
+            <TextField fx:id="firstFolderField" alignment="CENTER_LEFT" prefWidth="400.0" />
+            <Button fx:id="browseFirstFolder" alignment="CENTER_RIGHT" mnemonicParsing="false" text="Обзор..." />
+          </children>
+        </HBox>
+        <HBox alignment="TOP_CENTER" prefHeight="-1.0" prefWidth="-1.0">
+          <children>
+            <TextField fx:id="secondFolderField" alignment="CENTER_LEFT" prefWidth="400.0" />
+            <Button fx:id="browseSecondFolder" alignment="CENTER_RIGHT" mnemonicParsing="false" text="Обзор..." />
+            <Button fx:id="scanSecondFolder" alignment="CENTER_RIGHT" mnemonicParsing="false" text="Сканирование" />
+            <Button fx:id="stopScanSecondFolder" alignment="CENTER_RIGHT" mnemonicParsing="false" text="Стоп" />
+          </children>
+        </HBox>
+        <HBox alignment="TOP_CENTER" prefHeight="-1.0" prefWidth="-1.0">
+          <children>
+            <TextField fx:id="destFolderField" alignment="CENTER_LEFT" prefWidth="400.0" />
+            <Button fx:id="browseDestFolder" alignment="CENTER_RIGHT" mnemonicParsing="false" text="Обзор..." />
+          </children>
+        </HBox>
+        <HBox alignment="TOP_CENTER" prefHeight="-1.0" prefWidth="-1.0">
+          <children>
+            <Button fx:id="startButton" alignment="CENTER_RIGHT" mnemonicParsing="false" text="Старт" />
+            <Button fx:id="stopButton" alignment="CENTER_RIGHT" mnemonicParsing="false" text="Стоп" />
+            <Button fx:id="checkButton" alignment="CENTER_RIGHT" mnemonicParsing="false" text="Проверить" />
+            <Button fx:id="compareButton" mnemonicParsing="false" text="Сравнить" />
+          </children>
+        </HBox>
+        <HBox alignment="CENTER_LEFT" prefHeight="-1.0" prefWidth="-1.0">
+          <children>
+            <VBox alignment="CENTER_LEFT" fillWidth="true" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" snapToPixel="true">
+              <children>
+                <Label fx:id="curentFileLabel" alignment="BOTTOM_LEFT" prefWidth="-1.0" text="Файл:" underline="false" />
+                <Label fx:id="totalFilesField" alignment="BOTTOM_LEFT" prefWidth="-1.0" text="Обработано файлов: " />
+                <Label fx:id="totalBytesField" prefWidth="-1.0" text="Обработано байт:" />
+              </children>
+            </VBox>
+          </children>
+        </HBox>
+      </children>
+    </VBox>
+  </children>
+  <padding>
+    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+  </padding>
 </AnchorPane>

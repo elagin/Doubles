@@ -23,7 +23,10 @@ public class Model {
     private Preferences preferences = Preferences.userNodeForPackage(Main.class);
     private List<FileInfo> fileList = new ArrayList<>();
     private Map<Long, FileInfo> fileMap = new HashMap<>();
+
     private SlowDriveCache slowDriveCache = new SlowDriveCache();
+    private SlowDriveCache nasCache = new SlowDriveCache();
+    private SlowDriveCache usbCache = new SlowDriveCache();
 
     public String getFirstFolder() {
         return preferences.get(FIRST_FOLDER, "");
@@ -105,7 +108,12 @@ public class Model {
     }
 
     public void loadSlow() {
-        slowDriveCache.deserialize();
+        //slowDriveCache.deserialize();
+        nasCache.deserialize("nas.bin");
+        usbCache.deserialize("usb.bin");
+
+//        nasCache.deserialize("usb.bin");
+//        usbCache.deserialize("nas.bin");
     }
 
     public void saveSlow() {
@@ -128,4 +136,32 @@ public class Model {
     public String getFileNameFromCache(Long crc) {
         return slowDriveCache.getFileName(crc);
     }
+    public SlowDriveCache getNasCache() {
+        return nasCache;
+    }
+
+    public SlowDriveCache getUsbCache() {
+        return usbCache;
+    }
+
+    public boolean removeNas(Long crc) {
+        return nasCache.remove(crc);
+    }
+
+    public Map.Entry<String, Long> getUsbEntrySet() {
+        return usbCache.getEntrySet();
+    }
+
+    public Map<String, Long> getUsbMap() {
+        return usbCache.getMap();
+    }
+
+    public long getUsbSize(){
+        return usbCache.size();
+    }
+
+    public long getNasSize(){
+        return nasCache.size();
+    }
+
 }

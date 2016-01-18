@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import static sample.Utils.readableFileSize;
@@ -66,6 +67,9 @@ public class Controller implements Initializable {
     @FXML
     private Button checkButton;
 
+    @FXML
+    private Button compareButton;
+
     // MODEL
     private final Model model = new Model();
 
@@ -89,6 +93,7 @@ public class Controller implements Initializable {
         bindBrowseButtonsEvents();
         bindScanButtonsEvents();
         bindCheckButtonEvents();
+        bindCompareButtonEvents();
         initFields();
 
         model.loadSlow();
@@ -400,6 +405,30 @@ public class Controller implements Initializable {
             filesWalkThread.setDaemon(true);
             filesWalkThread.start();
             //threadIsActive = true;
+        });
+    }
+
+    private void bindCompareButtonEvents() {
+        compareButton.setOnAction(event -> {
+            SlowDriveCache usb = model.getUsbCache();
+            //SlowDriveCache nas = model.getNasCache();
+            //Map<String, Long> map = (Map<String, Long>) (Map<String, Long>) model.getUsbEntrySet();
+            System.out.println(String.format("nas: %d / usb: %d", model.getNasSize(), model.getUsbSize()));
+            System.out.println("Сравнение...");
+            long startTimer = System.currentTimeMillis();
+            Map<String, Long> map = model.getUsbMap();
+            for (Map.Entry<String, Long> e : map.entrySet()) {
+                String key = e.getKey();
+                Long value = e.getValue();
+                model.removeNas(value);
+            }
+            System.out.println("Сравнение завершено");
+            System.out.println(Utils.workTimeToString(startTimer));
+            System.out.println(String.format("nas: %d", model.getNasSize()));
+
+//            if (slowWalkThread != null && threadSlowIsActive)
+//                slowWalkThread.interrupt();
+//            threadSlowIsActive = false;
         });
     }
 }
